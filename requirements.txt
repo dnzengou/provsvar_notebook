@@ -1,7 +1,7 @@
 numpy
 matplotlib
+plotly
 ipywidgets
 jupyter_contrib_nbextensions
 seaborn
 voila
-voila-material
