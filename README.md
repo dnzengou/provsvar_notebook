@@ -1,1 +1,1 @@
-![screen capture](prosvar_notebook_voila_binder.png)
+![screen capture](provsvar_app_home1.png)

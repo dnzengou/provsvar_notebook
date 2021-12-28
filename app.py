@@ -32,6 +32,8 @@ external_stylesheets = [
 
 # create an instance of the Dash class: nitializing a Dash class by initializing a WSGI application using Dash(__name__)
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
+
 app.title = "Patient Provsvar Analytics: Visualize Your Patient Test Results!"
 
 

@@ -1,9 +1,4 @@
 numpy
-matplotlib
-plotly
-ipywidgets
-jupyter_contrib_nbextensions
-seaborn
-voila
-openpyxl
-folium
+dash==1.13.3
+pandas==1.0.5
+gunicorn==20.0.4
