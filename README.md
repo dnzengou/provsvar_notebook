@@ -1,1 +1,1 @@
-![screen capture](provsvar_app_home1.png)
+![screen capture](assets/img/provsvar_app_home1.png)
