@@ -11,7 +11,7 @@ data = pd.read_csv('data/provsvar_sept_anonym_122021-Blad11_mal_full_clean.csv')
 #data = pd.read_csv('data/provsvar_sept_anonym_full_clean_indexed.csv') # with 
 
 # data cleaning
-# renaming the df column names to lowercase
+# renaming the dataframe 'data' column names to lowercase
 data.columns = map(str.lower, data.columns)
 
 data.rename(columns = {'provsvar 1':'provsvar1', 'provsvar 2':'provsvar2', 'provsvar 3':'provsvar3', 'provsvar 4':'provsvar4', 'provsvar 5':'provsvar5', 'provsvar 6':'provsvar6', 'värde 1':'varde1', 'värde 2':'varde2', 'värde 3':'varde3', 'värde 4':'varde4', 'värde 5':'varde5',
@@ -114,6 +114,144 @@ app.layout = html.Div(
                 columns=[
                     {"name": i, "id": i} for i in sorted(data.columns)
                 ],
+                
+                
+    editable=True,
+    style_data_conditional=[
+        {
+            'if': {
+                'column_id': 'personnummer',
+            },
+            'backgroundColor': 'grey',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'column_id': 'total_bedomning',
+                'filter_query': '{total_bedomning} = GRON' # {} around column names
+            },
+            'backgroundColor': 'green',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'column_id': 'bedomning1',
+                'filter_query': '{bedomning1} = GRON' # {} around column names
+            },
+            'backgroundColor': 'green',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'column_id': 'bedomning2',
+                'filter_query': '{bedomning2} = GRON' # {} around column names
+            },
+            'backgroundColor': 'green',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'column_id': 'bedomning3',
+                'filter_query': '{bedomning3} = GRON' # {} around column names
+            },
+            'backgroundColor': 'green',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'column_id': 'bedomning4',
+                'filter_query': '{bedomning4} = GRON' # {} around column names
+            },
+            'backgroundColor': 'green',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'column_id': 'bedomning5',
+                'filter_query': '{bedomning5} = GRON' # {} around column names
+            },
+            'backgroundColor': 'green',
+            'color': 'white'
+        },
+        {
+            'if': {
+                'filter_query': '{total_bedomning} = GUL',
+                'column_id': 'total_bedomning'
+            },
+            'backgroundColor': 'yellow',
+            'color': 'darkgrey'
+        },
+        {
+            'if': {
+                'filter_query': '{total_bedomning} = RÖD',
+                'column_id': 'total_bedomning'
+            },
+            'backgroundColor': 'red',
+            'color': 'white'
+        },
+        
+        # now let's play a bit with other filtering, for a test
+        {
+            'if': {
+                'column_id': 'varde1',
+
+                # since using .format, escape { with {{
+                'filter_query': '{{varde1}} = {}'.format(data['varde1'].max())
+            },
+            'backgroundColor': '#85144b',
+            'color': 'white'
+        },
+
+        {
+            'if': {
+                'row_index': data['varde2'].max(),  # number | 'odd' | 'even', eg. row_index: 5
+                'column_id': 'varde2'
+            },
+            'backgroundColor': 'hotpink',
+            'color': 'white'
+        },
+
+        {
+            'if': {
+                'filter_query': '{varde4} > {varde5}', # comparing columns to each other
+                'column_id': 'varde4'
+            },
+            'backgroundColor': 'cyan'
+        },
+
+        {
+            'if': {
+                'filter_query': '{varde2} > {varde3}', # comparing columns to each other
+                'column_id': 'varde4'
+            },
+            'backgroundColor': 'lighblue'
+        },
+
+        {
+            'if': {
+                'column_editable': False  # True | False
+            },
+            'backgroundColor': 'rgb(240, 240, 240)',
+            'cursor': 'not-allowed'
+        },
+
+        {
+            'if': {
+                'column_type': 'text'  # 'text' | 'any' | 'datetime' | 'numeric'
+            },
+            'textAlign': 'left'
+        },
+
+        {
+            'if': {
+                'state': 'active'  # 'active' | 'selected'
+            },
+           'backgroundColor': 'rgba(0, 116, 217, 0.3)',
+           'border': '1px solid rgb(0, 116, 217)'
+        }
+
+    ],                
+                
                 page_current=0,
                 page_size=20,
                 page_action='custom',
@@ -352,9 +490,6 @@ def update_table(page_current, page_size, sort_by, filter):
     return dff.iloc[
         page_current*page_size: (page_current + 1)*page_size
     ].to_dict('records')
-
-
-
 
 
 
