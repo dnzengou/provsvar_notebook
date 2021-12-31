@@ -57,6 +57,58 @@ app.layout = html.Div(
         ),
         
         html.Div(
+            children=[
+                html.Div(
+                    children=[
+                        html.Div(children="Värde 1", className="menu-title"),
+                        dcc.Dropdown(
+                            id="varde1-filter",
+                            options=[
+                                {"label": varde1, "value": varde1}
+                                for varde1 in np.sort(data.varde1.unique())
+                            ],
+                            value="13",
+                            clearable=False,
+                            className="dropdown",
+                        ),
+                    ]
+                ),
+                html.Div(
+                    children=[
+                        html.Div(children="Värde 2", className="menu-title"),
+                        dcc.Dropdown(
+                            id="varde2-filter",
+                            options=[
+                                {"label": varde2, "value": varde2}
+                                for varde2 in data.varde2.unique()
+                            ],
+                            value="0.92",
+                            clearable=False,
+                            searchable=False,
+                            className="dropdown",
+                        ),
+                    ],
+                ),
+                html.Div(
+                    children=[
+                        html.Div(
+                            children="Date Range",
+                            className="menu-title"
+                            ),
+                        dcc.DatePickerRange(
+                            id="date-range",
+                            min_date_allowed=data.provsvarsdate.min().date(),
+                            max_date_allowed=data.provsvarsdate.max().date(),
+                            start_date=data.provsvarsdate.min().date(),
+                            end_date=data.provsvarsdate.max().date(),
+                        ),
+                    ]
+                ),
+            ],
+            className="menu",
+        ),
+        
+        html.Div(
             dash_table.DataTable(
                 id='table-paging-with-graph',
                 columns=[
@@ -256,8 +308,62 @@ app.layout = html.Div(
                         figure={
                             "data": [
                                 {
-                                    "x": data["provsvarsdate"],
+                                    "x": data["personnummer"],
                                     "y": data["varde2"],
+                                    "type": "bar",
+                                    "marker": {"color": "#0074D9"},
+                                },
+                            ],
+                            "layout": {
+                                "title": {
+                                    "text": "Värde 2 av personnummer",
+                                    "x": 0.05,
+                                    "xanchor": "left",
+                                },
+                                "xaxis": {"fixedrange": True},
+                                "yaxis": {"fixedrange": True},
+                                "colorway": ["#0074D9"],
+                            },
+                        },
+                    ),                    
+                    className="card",
+                ),
+                html.Div(
+                    children=dcc.Graph(
+                        id="varde3-chart",
+                        config={"displayModeBar": False},
+                        figure={
+                            "data": [
+                                {
+                                    "x": data["personnummer"],
+                                    "y": data["varde3"],
+                                    "type": "bar",
+                                    "marker": {"color": "#0074D9"},
+                                },
+                            ],
+                            "layout": {
+                                "title": {
+                                    "text": "Värde 3 av personnummer",
+                                    "x": 0.05,
+                                    "xanchor": "left",
+                                },
+                                "xaxis": {"fixedrange": True},
+                                "yaxis": {"fixedrange": True},
+                                "colorway": ["#0074D9"],
+                            },
+                        },
+                    ),                    
+                    className="card",
+                ),
+                html.Div(
+                    children=dcc.Graph(
+                        id="varde4-chart",
+                        config={"displayModeBar": False},
+                        figure={
+                            "data": [
+                                {
+                                    "x": data["provsvarsdate"],
+                                    "y": data["varde4"],
                                     "type": "lines",
                                     "hovertemplate": "%{y:.2f}"
                                                      "<extra></extra>",
@@ -265,7 +371,7 @@ app.layout = html.Div(
                             ],
                             "layout": {
                                 "title": {
-                                    "text": "Värde 2 över tiden",
+                                    "text": "Värde 4 över tiden",
                                     "x": 0.05,
                                     "xanchor": "left",
                                 },
@@ -282,7 +388,7 @@ app.layout = html.Div(
                 ),                    
                 html.Div(
                     children=dcc.Graph(
-                        id="varde3-chart",
+                        id="varde5-chart",
                         config={"displayModeBar": False},
                         figure={
                             "data": [
@@ -294,7 +400,7 @@ app.layout = html.Div(
                             ],
                             "layout": {
                                 "title": {
-                                    "text": "Värde 3 över tiden",
+                                    "text": "Värde 5 över tiden",
                                     "x": 0.05,
                                     "xanchor": "left",
                                 },
@@ -384,6 +490,63 @@ def update_table(page_current, page_size, sort_by, filter):
     return dff.iloc[
         page_current*page_size: (page_current + 1)*page_size
     ].to_dict('records')
+
+
+
+@app.callback(
+    [Output("varde1-chart", "figure"), Output("varde2-chart", "figure")],
+    [
+        Input("varde1-filter", "value"),
+        Input("varde2-filter", "value"),
+        Input("date-range", "start_date"),
+        Input("date-range", "end_date"),
+    ],
+)
+def update_charts(varde1, varde2, start_date, end_date):
+    mask = (
+        (data.varde1 == varde1)
+        & (data.varde2 == varde2)
+        & (data.provsvarsdate >= start_date)
+        & (data.provsvarsdate <= end_date)
+    )
+    filtered_data = data.loc[mask, :]
+    varde1_chart_figure = {
+        "data": [
+            {
+                "x": filtered_data["provsvarsdate"],
+                "y": filtered_data["varde1"],
+                "type": "lines",
+                "hovertemplate": "%{y:.2f}<extra></extra>",
+            },
+        ],
+        "layout": {
+            "title": {
+                "text": "Varde 1 över tiden",
+                "x": 0.05,
+                "xanchor": "left",
+            },
+            "xaxis": {"fixedrange": True},
+            "yaxis": {"tickprefix": "", "fixedrange": True},
+            "colorway": ["#17B897"],
+        },
+    }
+
+    varde2_chart_figure = {
+        "data": [
+            {
+                "x": filtered_data["provsvarsdate"],
+                "y": filtered_data["varde2"],
+                "type": "lines",
+            },
+        ],
+        "layout": {
+            "title": {"text": "Varde 2 över tiden", "x": 0.05, "xanchor": "left"},
+            "xaxis": {"fixedrange": True},
+            "yaxis": {"fixedrange": True},
+            "colorway": ["#E12D39"],
+        },
+    }
+    return varde1_chart_figure, varde2_chart_figure
 
 
 
